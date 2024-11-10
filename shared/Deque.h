@@ -34,7 +34,8 @@ public:
 		if (Base::IsFull())
 			Base::Resize();
 
-		// TODO:
+		Base::mpQue[Base::mFront] = item;
+		Base::mFront = (Base::mFront - 1 + Base::mCapa) % Base::mCapa;
 	}
 
 	void PushBack(const T& item)
@@ -50,10 +51,6 @@ public:
 	void PopBack()
 	{
 		assert(!Base::IsEmpty());
-
-		// TODO:
+		Base::mRear = (Base::mRear - 1 + Base::mCapa) % Base::mCapa;
 	}
-
-private:
-	// Queue와 동일
 };
