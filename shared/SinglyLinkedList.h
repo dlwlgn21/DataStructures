@@ -10,7 +10,7 @@ public:
 	struct Node
 	{
 		T item = T();
-		Node* next = nullptr;
+		Node* pNext = nullptr;
 	};
 
 	SinglyLinkedList()
@@ -20,6 +20,12 @@ public:
 	SinglyLinkedList(const SinglyLinkedList& list)
 	{
 		// TODO: 연결 리스트 복사
+		Node* pOther = list.mpRoot;
+		while (pOther != nullptr)
+		{
+			PushBack(pOther->item);
+			pOther = pOther->pNext;
+		}
 	}
 
 	~SinglyLinkedList()
@@ -29,12 +35,18 @@ public:
 
 	void Clear() // 모두 지워야(delete) 합니다.
 	{
-		// TODO: 모두 삭제
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			Node* pTmp = pCurr;
+			pCurr = pCurr->pNext;
+			delete pTmp;
+		}
 	}
 
 	bool IsEmpty()
 	{
-		return first_ == nullptr;
+		return mpRoot == nullptr;
 	}
 
 	int Size()
@@ -42,64 +54,107 @@ public:
 		int size = 0;
 
 		// TODO: size를 하나하나 세어서 반환
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			++size;
+			pCurr = pCurr->pNext;
+		}
 
 		return size;
 	}
 
 	T Front()
 	{
-		assert(first_);
+		assert(mpRoot);
 
-		return T(); // TODO: 수정
+		return mpRoot->item; // TODO: 수정
 	}
 
 	T Back()
 	{
-		assert(first_);
-
-		return T(); // TODO: 수정
+		assert(mpRoot);
+		Node* pCurr = mpRoot;
+		while (pCurr->pNext != nullptr)
+		{
+			pCurr = pCurr->pNext;
+		}
+		return pCurr->item; // TODO: 수정
 	}
 
 	Node* Find(T item)
 	{
-		// TODO: item이 동일한 노드 포인터 반환
-
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			if (pCurr->item == item)
+				return pCurr;
+			pCurr = pCurr->pNext;
+		}
 		return nullptr;
 	}
 
-	void InsertBack(Node* node, T item)
+	void InsertBack(Node* pNode, T item)
 	{
 		// TODO:
+		if (pNode == nullptr)
+			return;
+		Node* pOriNext = pNode->pNext;
+		Node* pNewNode = new Node();
+		pNewNode->item = item;
+		pNode->pNext = pNewNode;
+		pNewNode->pNext = pOriNext;
 	}
 
-	void Remove(Node* n)
+	void Remove(Node* pNode)
 	{
-		assert(first_);
-
+		assert(mpRoot);
 		// 하나 앞의 노드를 찾아야 합니다.
 		// TODO:
+		if (pNode == mpRoot)
+		{
+			delete pNode;
+			mpRoot = nullptr;
+			return;
+		}
+
+		Node* pCurr = mpRoot;
+		Node* pPrev = pCurr;
+		while (pCurr != nullptr)
+		{
+			if (pCurr == pNode)
+			{
+				break;
+			}
+			pPrev = pCurr;
+			pCurr = pCurr->pNext;
+		}
+		pPrev->pNext = pNode->pNext;
+		delete pNode;
 	}
 
 	void PushFront(T item)
 	{
-		// first_가 nullptr인 경우와 아닌 경우 나눠서 생각해보기 (결국은 두 경우를 하나로 합칠 수 있음)
-
-		// 새로운 노드 만들기
-		// TODO:
-
-		// 연결 관계 정리
-		// TODO:
+		Node* pNewNode = new Node();
+		pNewNode->item = item;
+		pNewNode->pNext = mpRoot;
+		mpRoot = pNewNode;
 	}
 
 	void PushBack(T item)
 	{
-		if (first_)
+		Node* pCurr = mpRoot;
+		Node* pNewNode = new Node();
+		pNewNode->item = item;
+		if (pCurr != nullptr)
 		{
-			// TODO:
+			while (pCurr->pNext != nullptr)
+				pCurr = pCurr->pNext;
+			pCurr->pNext = pNewNode;
 		}
 		else
 		{
-			// TODO:
+			mpRoot = pNewNode;
 		}
 	}
 
@@ -112,9 +167,10 @@ public:
 			return;
 		}
 
-		assert(first_);
-
-		// TODO: 메모리 삭제
+		assert(mpRoot != nullptr);
+		Node* pTmp = mpRoot->pNext;
+		delete mpRoot;
+		mpRoot = pTmp;
 	}
 
 	void PopBack()
@@ -128,26 +184,47 @@ public:
 
 		// 맨 뒤에서 하나 앞의 노드를 찾아야 합니다.
 
-		assert(first_);
-
-		// TODO: 메모리 삭제
+		assert(mpRoot != nullptr);
+		Node* pCurr = mpRoot;
+		Node* pPrev = pCurr;
+		while (pCurr->pNext != nullptr)
+		{
+			pPrev = pCurr;
+			pCurr = pCurr->pNext;
+		}
+		delete pCurr;
+		pPrev->pNext = nullptr;
 	}
 
 	void Reverse()
 	{
 		// TODO: 
+		if (Size() > 1)
+		{
+			Node* pReverseNext = nullptr;
+			Node* pCurr = mpRoot;
+			Node* pTmp = nullptr;
+			while (pCurr != nullptr)
+			{
+				pTmp = pCurr->pNext;
+				pCurr->pNext = pReverseNext;
+				pReverseNext = pCurr;
+				pCurr = pTmp;
+			}
+			mpRoot = pReverseNext;
+		}
 	}
 
 	void SetPrintDebug(bool flag)
 	{
-		print_debug_ = flag;
+		mbIsPrintDebug = flag;
 	}
 
 	void Print()
 	{
 		using namespace std;
 
-		Node* current = first_;
+		Node* current = mpRoot;
 
 		if (IsEmpty())
 			cout << "Empty" << endl;
@@ -157,33 +234,32 @@ public:
 
 			while (current)
 			{
-				if (print_debug_)
+				if (mbIsPrintDebug)
 				{
 					//cout << "[" << current << ", " << current->item << ", " << current->next << "]";
 
 					// 주소를 짧은 정수로 출력 (앞 부분은 대부분 동일하기때문에 뒷부분만 출력)
 					cout << "[" << reinterpret_cast<uintptr_t>(current) % 100000 << ", "
 						<< current->item << ", "
-						<< reinterpret_cast<uintptr_t>(current->next) % 100000 << "]";
+						<< reinterpret_cast<uintptr_t>(current->pNext) % 100000 << "]";
 				}
 				else
 				{
 					cout << current->item;
 				}
 
-				if (current->next)
+				if (current->pNext)
 					cout << " -> ";
 				else
 					cout << " -> NULL";
 
-				current = current->next;
+				current = current->pNext;
 			}
 			cout << endl;
 		}
 	}
 
 protected:
-	Node* first_ = nullptr;
-
-	bool print_debug_ = false;
+	Node* mpRoot = nullptr;
+	bool mbIsPrintDebug = false;
 };

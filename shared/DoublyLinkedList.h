@@ -12,10 +12,8 @@ public:
 	{
 		T item = T();
 
-		Node* left = nullptr;
-		Node* right = nullptr;
-
-		// 참고: prev/next가 아니라 left/right
+		Node* pLeft = nullptr;
+		Node* pRight = nullptr;
 	};
 
 	DoublyLinkedList()
@@ -30,19 +28,30 @@ public:
 	void Clear() // 모두 지워야(delete) 합니다.
 	{
 		// TODO:
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			Node* pTmp = pCurr->pRight;
+			delete pCurr;
+			pCurr = pTmp;
+		}
 	}
 
 	bool IsEmpty()
 	{
-		return true; // TODO:
+		return mpRoot == nullptr;
 	}
 
 	int Size()
 	{
 		int size = 0;
 
-		// TODO:
-
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			++size;
+			pCurr = pCurr->pRight;
+		}
 		return size;
 	}
 
@@ -50,8 +59,8 @@ public:
 	{
 		using namespace std;
 
-		Node* current = first_;
-
+		Node* pCurr = mpRoot;
+		Node* pPrev = pCurr;
 		if (IsEmpty())
 			cout << "Empty" << endl;
 		else
@@ -60,20 +69,39 @@ public:
 
 			cout << " Forward: ";
 			// TODO:
+			while (pCurr != nullptr)
+			{
+				cout << pCurr->item << " ";
+				pPrev = pCurr;
+				pCurr = pCurr->pRight;
+			}
 			cout << endl;
 
 			cout << "Backward: ";
 			// TODO:
+			pCurr = pPrev;
+			while (pCurr != nullptr)
+			{
+				cout << pCurr->item << " ";
+				pCurr = pCurr->pLeft;
+			}
 			cout << endl;
 		}
 	}
 
 	Node* Find(T item)
 	{
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			if (pCurr->item == item)
+				return pCurr;
+			pCurr = pCurr->pRight;
+		}
 		return nullptr; // TODO:
 	}
 
-	void InsertBack(Node* node, T item)
+	void InsertBack(Node* pNode, T item)
 	{
 		if (IsEmpty())
 		{
@@ -81,18 +109,44 @@ public:
 		}
 		else
 		{
-			// TODO:
+			Node* pRight = pNode->pRight;
+			Node* pNewNode = new Node();
+			pNewNode->item = item;
+			pNode->pRight = pNewNode;
+			pNewNode->pRight = pRight;
+			pNewNode->pLeft = pNode;
+			if (pRight != nullptr)
+				pRight->pLeft = pNewNode;
 		}
 	}
 
 	void PushFront(T item)
 	{
-		// TODO:
+		Node* pNewNode = new Node();
+		pNewNode->item = item;
+		if (mpRoot != nullptr)
+			mpRoot->pLeft = pNewNode;
+		pNewNode->pLeft = nullptr;
+		pNewNode->pRight = mpRoot;
+		mpRoot = pNewNode;
 	}
 
 	void PushBack(T item)
 	{
 		// TODO:
+		if (mpRoot == nullptr)
+		{
+			PushFront(item);
+			return;
+		}
+		Node* pCurr = mpRoot;
+		while (pCurr->pRight != nullptr)
+			pCurr = pCurr->pRight;
+
+		Node* pNewNode = new Node();
+		pNewNode->item = item;
+		pNewNode->pLeft = pCurr;
+		pCurr->pRight = pNewNode;
 	}
 
 	void PopFront()
@@ -104,9 +158,13 @@ public:
 			return;
 		}
 
-		assert(first_);
+		assert(mpRoot);
 
-		// TODO:
+		Node* pRight = mpRoot->pRight;
+		delete mpRoot;
+		mpRoot = pRight;
+		if (mpRoot != nullptr)
+			pRight->pLeft = nullptr;
 	}
 
 	void PopBack()
@@ -118,32 +176,52 @@ public:
 			return;
 		}
 
-		// 맨 뒤에서 하나 앞의 노드를 찾아야 합니다.
+		assert(mpRoot);
+		Node* pCurr = mpRoot;
+		while (pCurr->pRight != nullptr)
+			pCurr = pCurr->pRight;
 
-		assert(first_);
-
-		// TODO:
+		Node* pLeft = pCurr->pLeft;
+		if (pLeft != nullptr)
+			pLeft->pRight = nullptr;
+		else
+			mpRoot = nullptr;
+		delete pCurr;
 	}
 
 	void Reverse()
 	{
-		// TODO:
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			Node* pNext = pCurr->pRight;
+			if (pNext == nullptr)
+			{
+				mpRoot = pCurr;
+			}
+			Node* pTmp = pCurr->pLeft;
+			pCurr->pLeft = pCurr->pRight;
+			pCurr->pRight = pTmp;
+			pCurr = pNext;
+		}
 	}
 
 	T Front()
 	{
-		assert(first_);
+		assert(mpRoot);
 
-		return T(); // TODO:
+		return mpRoot->item; // TODO:
 	}
 
 	T Back()
 	{
-		assert(first_);
-
-		return T(); // TODO:
+		assert(mpRoot);
+		Node* pCurr = mpRoot;
+		while (pCurr->pRight != nullptr)
+			pCurr = pCurr->pRight;
+		return pCurr->item; // TODO:
 	}
 
 protected:
-	Node* first_ = nullptr;
+	Node* mpRoot = nullptr;
 };

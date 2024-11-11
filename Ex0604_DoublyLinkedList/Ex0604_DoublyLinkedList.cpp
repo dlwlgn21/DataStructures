@@ -29,7 +29,7 @@ int main()
 	list.Print();
 
 	DoublyLinkedList<int>::Node* temp = list.Find(3);
-	list.InsertBack(temp, 1000);
+	list.InsertBack(temp, 99);
 	list.Print();
 
 	// PopFront()/Back() 테스트

@@ -52,12 +52,13 @@ void RecurMoveDisks(int n, int from, int temp, int to)
 	}
 	RecurMoveDisks(n - 1, from, to, temp);
 	MoveDisk(from, to);
+	//cout << "Move Disk " << static_cast<char>(n  - 1 + 'A') << " From " << from << " To " << to << endl;
 	RecurMoveDisks(n - 1, temp, from, to);
 }
 
 int main()
 {
-	int num_disks = 7;
+	int num_disks = 5;
 
 	for (int i = 0; i < num_disks; i++)
 		tower[0].Push('A' + i);
