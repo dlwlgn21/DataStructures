@@ -153,6 +153,6 @@ public:
 	}
 
 private:
-	Node*& root_ = BinarySearchTree<K, V>::root_;
+	Node*& root_ = BinarySearchTree<K, V>::mpRoot;
 	// this->root_로도 사용 가능
 };

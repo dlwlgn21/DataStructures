@@ -14,8 +14,8 @@ public:
 	struct Node
 	{
 		T item = T();
-		Node* left = nullptr; // Left child
-		Node* right = nullptr; // Right child
+		Node* pLeft = nullptr; // Left child
+		Node* pRight = nullptr; // Right child
 	};
 
 	// 디버깅 도구: 큐에서 주소 대신에 아이템 출력
@@ -50,12 +50,12 @@ public:
 
 	BinaryTree(Node* root)
 	{
-		root_ = root;
+		mpRoot = root;
 	}
 
 	bool IsEmpty()
 	{
-		return root_ == nullptr;
+		return mpRoot == nullptr;
 	}
 
 	void Visit(Node* node)
@@ -66,72 +66,98 @@ public:
 
 	int Sum()
 	{
-		return Sum(root_);
+		return GetSumRecur(mpRoot);
 	}
 
-	int Sum(Node* node)
+	int GetSumRecur(Node* pNode)
 	{
-		return 0; // TODO:
+		if (pNode == nullptr)
+			return 0;
+		return GetSumRecur(pNode->pLeft) + GetSumRecur(pNode->pRight) + pNode->item; // TODO:
 	}
 
 	int Height()
 	{
-		return Height(root_);
+		return GetHeightRecur(mpRoot);
 	}
 
-	int Height(Node* node)
+	int GetHeightRecur(Node* pNode)
 	{
-		return 0; // TODO:
+		int height = 1;
+		if (pNode->pLeft != nullptr)
+			height = std::max(GetHeightRecur(pNode->pLeft) + 1, height);
+		if (pNode->pRight != nullptr)
+			height = std::max(GetHeightRecur(pNode->pRight) + 1, height);
+		return height;
 	}
 
 	~BinaryTree()
 	{
-		DeleteTree(root_);
+		DeleteTreeRecur(mpRoot);
 	}
 
-	void DeleteTree(Node* node)
+	void DeleteTreeRecur(Node* pNode)
 	{
-		if (node)
-		{
-			// TODO: 힌트 Post-order
-		}
+		if (pNode == nullptr)
+			return;
+		DeleteTreeRecur(pNode->pLeft);
+		DeleteTreeRecur(pNode->pRight);
+		delete pNode;
 	}
 
-	void Preorder() { Preorder(root_); }
-	void Preorder(Node* node)
+	void Preorder() { PreorderRecur(mpRoot); }
+	void PreorderRecur(Node* pNode)
 	{
-		// TODO:
+		if (pNode == nullptr)
+			return;
+		Visit(pNode);
+		PreorderRecur(pNode->pLeft);
+		PreorderRecur(pNode->pRight);
 	};
 
-	void Inorder() { Inorder(root_); }
-	void Inorder(Node* node)
+	void Inorder() { InorderRecur(mpRoot); }
+	void InorderRecur(Node* pNode)
 	{
-		// TODO:
+		if (pNode == nullptr)
+			return;
+		InorderRecur(pNode->pLeft);
+		Visit(pNode);
+		InorderRecur(pNode->pRight);
 	}
 
-	void Postorder() { Postorder(root_); }
-	void Postorder(Node* node)
+	void Postorder() { PostorderRecur(mpRoot); }
+	void PostorderRecur(Node* pNode)
 	{
-		// TODO:
+		if (pNode == nullptr)
+			return;
+		PostorderRecur(pNode->pLeft);
+		PostorderRecur(pNode->pRight);
+		Visit(pNode);
 	}
 
 	void LevelOrder()
 	{
 		Queue<Node*> q; // 힌트: MyQueue q;
-		Node* current = root_;
-		while (current)
+		Node* pCurr = mpRoot;
+		q.Enqueue(pCurr);
+		while (!q.IsEmpty())
 		{
-			Visit(current);
-			// TODO:
+			pCurr = q.Front();
+			Visit(pCurr);
+			q.Dequeue();
+			if (pCurr->pLeft != nullptr)
+				q.Enqueue(pCurr->pLeft);
+			if (pCurr->pRight != nullptr)
+				q.Enqueue(pCurr->pRight);
 		}
 	}
 
 	void IterPreorder()
 	{
-		if (!root_) return;
+		if (!mpRoot) return;
 
 		Stack<Node*> s; // 힌트: MyStack q;
-		s.Push(root_);
+		s.Push(mpRoot);
 
 		while (!s.IsEmpty())
 		{
@@ -141,11 +167,11 @@ public:
 
 	void IterInorder()
 	{
-		if (!root_) return;
+		if (!mpRoot) return;
 
 		Stack<Node*> s;
 
-		Node* current = root_;
+		Node* current = mpRoot;
 		while (current || !s.IsEmpty())
 		{
 			// TODO:
@@ -154,10 +180,10 @@ public:
 
 	void IterPostorder()
 	{
-		if (!root_) return;
+		if (!mpRoot) return;
 
 		Stack<Node*> s1, s2;
-		s1.Push(root_);
+		s1.Push(mpRoot);
 
 		while (!s1.IsEmpty())
 		{
@@ -175,7 +201,7 @@ public:
 	void DisplayLevel(Node* p, int lv, int d);
 
 protected:
-	Node* root_ = nullptr;
+	Node* mpRoot = nullptr;
 };
 
 // 디버깅 편의 도구
@@ -195,7 +221,7 @@ void BinaryTree<T>::Print2D()
 template<typename T>
 void BinaryTree<T>::PrintLevel(int n) {
 	using namespace std;
-	Node* temp = root_;
+	Node* temp = mpRoot;
 	int val = (int)pow(2.0, Height() - n + 1.0);
 	cout << setw(val) << "";
 	DisplayLevel(temp, n, val);
@@ -224,8 +250,8 @@ void BinaryTree<T>::DisplayLevel(Node* p, int lv, int d) {
 			DisplayLevel(NULL, lv - 1, d);
 		}
 		else {
-			DisplayLevel(p->left, lv - 1, d);
-			DisplayLevel(p->right, lv - 1, d);
+			DisplayLevel(p->pLeft, lv - 1, d);
+			DisplayLevel(p->pRight, lv - 1, d);
 		}
 	}
 }

@@ -18,131 +18,208 @@ public:
 	{
 		Item item;
 
-		Node* left = nullptr;
-		Node* right = nullptr;
+		Node* pLeft = nullptr;
+		Node* pRight = nullptr;
+		Node(Item item, Node* pLeft, Node* pRight)
+		{
+			this->item = item;
+			this->pLeft = pLeft;
+			this->pRight = pRight;
+		}
 	};
 
 	void Preorder()
 	{
 		using namespace std;
-		Preorder(root_);
+		Preorder(mpRoot);
 		cout << endl;
 	}
 
-	void Preorder(Node* node)
+	void PreorderRecur(Node* pNode)
 	{
 		using namespace std;
-		if (node)
+		if (pNode)
 		{
-			cout << node->item.key << " ";
-			Preorder(node->left);
-			Preorder(node->right);
+			cout << pNode->item.key << " ";
+			PreorderRecur(pNode->pLeft);
+			PreorderRecur(pNode->pRight);
 		}
 	}
 
 	void Inorder()
 	{
 		using namespace std;
-		Inorder(root_);
+		InorderRecur(mpRoot);
 		cout << endl;
 	}
 
-	void Inorder(Node* node)
+	void InorderRecur(Node* pNode)
 	{
 		using namespace std;
-		if (node)
+		if (pNode)
 		{
-			Inorder(node->left);
-			cout << node->item.key << " ";
-			Inorder(node->right);
+			InorderRecur(pNode->pLeft);
+			cout << pNode->item.key << " ";
+			InorderRecur(pNode->pRight);
 		}
 	}
 
-	Item* RecurGet(const K& key)
+	Item* RecurGetOrNull(const K& key)
 	{
-		return RecurGet(root_, key);
+		return RecurGetOrNull(mpRoot, key);
 	}
 
-	Item* RecurGet(Node* node, const K& key)
+	Item* RecurGetOrNull(Node* pNode, const K& key)
 	{
-		if (!node) return nullptr; // <- 동일한 키를 가진 노드를 찾지 못하면 nullptr을 반환하는 기능
+		if (!pNode) return nullptr; // <- 동일한 키를 가진 노드를 찾지 못하면 nullptr을 반환하는 기능
 
-		if (key < node->item.key)
-			return RecurGet(node->left, key);
-		if (key > node->item.key)
-			return RecurGet(node->right, key);
+		if (key < pNode->item.key)
+			return RecurGetOrNull(pNode->pLeft, key);
+		if (key > pNode->item.key)
+			return RecurGetOrNull(pNode->pRight, key);
 
-		return &node->item; // if (key == node->item.key)
+		return &pNode->item; // if (key == node->item.key)
 	}
 
-	Item* IterGet(const K& key)
+	Item* IterGetOrNull(const K& key)
 	{
 		// TODO:
+		Node* pCurr = mpRoot;
+		while (pCurr != nullptr)
+		{
+			if (pCurr->item.key == key)
+				return &pCurr->item;
 
-		return nullptr; // No matching
+			if (key < pCurr->item.key)
+				pCurr = pCurr->pLeft;
+			else
+				pCurr = pCurr->pRight;
+		}
+		return nullptr;
 	}
 
 	void Insert(const Item& item)
 	{
 		using namespace std;
 		cout << "Insert " << item.key << item.value << endl;
-		root_ = Insert(root_, item);
+		mpRoot = InsertRecur(mpRoot, item);
 	}
 
-	Node* Insert(Node* node, const Item& item)
+	Node* InsertRecur(Node* pNode, const Item& item)
 	{
-		// 힌트: RecurGet()
+		if (pNode == nullptr)
+			return new Node(item, nullptr, nullptr);
 
-		// TODO:
-
-		return node;
+		if (item.key < pNode->item.key)
+			pNode->pLeft = InsertRecur(pNode->pLeft, item);
+		else if (item.key > pNode->item.key)
+			pNode->pRight = InsertRecur(pNode->pRight, item);
+		else
+		{
+			pNode->item = item;
+			return pNode;
+		}
+		return pNode;
 	}
 
 	void IterInsert(const Item& item)
 	{
-		// TODO:
+		if (mpRoot == nullptr)
+		{
+			mpRoot = new Node(item, nullptr, nullptr);
+			return;
+		}
+		Node* pCurr = mpRoot;
+		Node* pPrev = pCurr;
+		while (pCurr != nullptr)
+		{
+			pPrev = pCurr;
+			if (item.key < pCurr->item.key)
+				pCurr = pCurr->pLeft;
+			else if (item.key > pCurr->item.key)
+				pCurr = pCurr->pRight;
+			else
+			{
+				pCurr->item = item;
+				return;
+			}
+		}
+		Node* pNewNode = new Node(item, nullptr, nullptr);
+		if (item.key < pPrev->item.key)
+			pPrev->pLeft = pNewNode;
+		else
+			pPrev->pRight = pNewNode;
 	}
 
-	Node* MinKeyLeft(Node* node)
+	Node* GetMinKeyNodeFromRightSubTree(Node* pNode)
 	{
-		assert(node);
-		while (node->left)
-			node = node->left;
-		return node;
+		assert(pNode);
+		while (pNode->pLeft != nullptr)
+			pNode = pNode->pLeft;
+		return pNode;
 	}
 
 	void Remove(const K& key)
 	{
 		using namespace std;
 		cout << "Remove " << key << endl;
-		root_ = Remove(root_, key);
+		mpRoot = RemoveRecur(mpRoot, key);
 	}
 
-	Node* Remove(Node* node, const K& key)
+	Node* RemoveRecur(Node* pNode, const K& key)
 	{
-		if (!node) return node;
+		if (pNode == nullptr) 
+			return pNode;
 
-		if (key < node->item.key)
-			node->left = Remove(node->left, key);
-		else if (key > node->item.key)
-			node->right = Remove(node->right, key);
+		if (key < pNode->item.key)
+			pNode->pLeft = RemoveRecur(pNode->pLeft, key);
+		else if (key > pNode->item.key)
+			pNode->pRight = RemoveRecur(pNode->pRight, key);
 		else
 		{
-			// TODO:
+			if (pNode->pLeft == nullptr && pNode->pRight == nullptr)
+			{
+				delete pNode;
+				return nullptr;
+			}
+
+			if (pNode->pRight == nullptr)
+			{
+				Node* pLeft = pNode->pLeft;
+				pNode->item = pLeft->item;
+				delete pLeft;
+				pNode->pLeft = nullptr;
+				return pNode;
+			}
+			else if (pNode->pLeft == nullptr)
+			{
+				Node* pRight = pNode->pRight;
+				pNode->item = pRight->item;
+				delete pRight;
+				pNode->pRight = nullptr;
+				return pNode;
+			}
+			else
+			{
+				Node* pMinNode = GetMinKeyNodeFromRightSubTree(pNode->pRight);
+				pNode->item = pMinNode->item;
+				pNode->pRight = RemoveRecur(pNode->pRight, pNode->item.key);
+				return pNode;
+			}
 		}
 
-		return node;
+		return pNode;
 	}
 
 	int Height()
 	{
-		return Height(root_);
+		return GetHeightRecur(mpRoot);
 	}
 
-	int Height(Node* node)
+	int GetHeightRecur(Node* pNode)
 	{
-		if (!node) return 0;
-		return 1 + std::max(Height(node->left), Height(node->right));
+		if (!pNode) return 0;
+		return 1 + std::max(GetHeightRecur(pNode->pLeft), GetHeightRecur(pNode->pRight));
 	}
 
 	void Print2D();
@@ -150,7 +227,7 @@ public:
 	void DisplayLevel(Node* p, int lv, int d);
 
 protected:
-	Node* root_ = nullptr;
+	Node* mpRoot = nullptr;
 };
 
 // 디버깅 편의 도구
@@ -172,7 +249,7 @@ void BinarySearchTree<K, V>::Print2D()
 template<typename K, typename V>
 void BinarySearchTree<K, V>::PrintLevel(int n) {
 	using namespace std;
-	Node* temp = root_;
+	Node* temp = mpRoot;
 	int val = (int)pow(2.0, Height() - n + 1.0);
 	cout << setw(val) << "";
 	DisplayLevel(temp, n, val);
@@ -201,8 +278,8 @@ void BinarySearchTree<K, V>::DisplayLevel(Node* p, int lv, int d) {
 			DisplayLevel(NULL, lv - 1, d);
 		}
 		else {
-			DisplayLevel(p->left, lv - 1, d);
-			DisplayLevel(p->right, lv - 1, d);
+			DisplayLevel(p->pLeft, lv - 1, d);
+			DisplayLevel(p->pRight, lv - 1, d);
 		}
 	}
 }

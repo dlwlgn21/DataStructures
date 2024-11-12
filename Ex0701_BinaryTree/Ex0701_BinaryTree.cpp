@@ -32,9 +32,9 @@ int main()
 	Node* n3 = new Node{ 3, nullptr, nullptr };
 	Node* n4 = new Node{ 4, nullptr, nullptr };
 	Node* n5 = new Node{ 5, nullptr, n4 };
-	Node* n6 = new Node{ 6, n2, n5 };
+	Node* n6 = new Node{ 6, n2, n4 };
 
-	n1->right = n3; // <- 연결관계 변경
+	n1->pRight = n3; // <- 연결관계 변경
 
 	BinaryTree<int> tree(n6); // <- n6의 주소를 root node로 
 

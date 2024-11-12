@@ -19,11 +19,11 @@ int main()
 
 	bst.Inorder(); // key에 대해 정렬
 
-	cout << bst.RecurGet(5)->value << endl;
-	cout << bst.RecurGet(3)->value << endl;
-	cout << bst.RecurGet(7)->value << endl;
-	cout << bst.RecurGet(1)->value << endl;
-	cout << bst.RecurGet(4)->value << endl;
+	cout << bst.RecurGetOrNull(5)->value << endl;
+	cout << bst.RecurGetOrNull(3)->value << endl;
+	cout << bst.RecurGetOrNull(7)->value << endl;
+	cout << bst.RecurGetOrNull(1)->value << endl;
+	cout << bst.RecurGetOrNull(4)->value << endl;
 
 	for (int i : {5, 4, 7, 8, 9})
 	{
