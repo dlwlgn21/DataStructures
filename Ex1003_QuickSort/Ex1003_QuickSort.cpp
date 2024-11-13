@@ -32,14 +32,35 @@ int Partition(int arr[], int low, int high, int n)
 	int i = low - 1;
 	int j = high + 1;
 
+	cout << "pivot=" << pivot << endl;
+	cout << "         ";
+	Print(arr, low, high, n);
+
 	while (true)
 	{
 		// TODO:
+		do 
+		{
+			++i;
+		} 
+		while (arr[i] < pivot);
+		
+		do
+		{
+			--j;
+		}
+		while (arr[j] > pivot);
+	
+		if (i >= j)
+			return j;
 
+		std::swap(arr[i], arr[j]);
 		cout << "pivot=" << pivot << ", i=" << i << ", j=" << j << endl;
 		cout << "         ";
 		Print(arr, low, high, n);
 	}
+
+	return j;
 }
 
 void QuickSort(int arr[], int low, int high, int n) // 마지막 n은 출력용

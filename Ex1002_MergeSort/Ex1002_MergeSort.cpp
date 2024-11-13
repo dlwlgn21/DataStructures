@@ -36,6 +36,20 @@ void Merge(int init[], int merged[], int left, int mid, int right)
 	// 인덱스를 2개 이용해서 정렬하면서 merge
 	// TODO:
 
+	while (i <= mid && j <= right)
+	{
+		if (init[i] < init[j])
+			merged[k++] = init[i++];
+		else
+			merged[k++] = init[j++];
+	}
+
+	for (int ii = i; ii <= mid; ++ii)
+		merged[k++] = init[ii];
+	for (int jj = j; jj <= right; ++jj)
+		merged[k++] = init[jj];
+
+
 	// 남은 내용들 복사
 	// TODO:
 
@@ -64,8 +78,8 @@ void MergeSort(int arr[], int merged[], int left, int right)
 
 int main()
 {
-	//int arr[] = { 3, 4, 2, 1, 7, 5, 8, 9, 0, 6 }; // 위키피디아 예시
-	int arr[] = { 38, 27, 43, 3, 9, 82, 10 }; // https://en.wikipedia.org/wiki/Merge_sort
+	int arr[] = { 3, 4, 2, 1, 7, 5, 8, 9, 0, 6 }; // 위키피디아 예시
+	//int arr[] = { 38, 27, 43, 3, 9, 82, 10 }; // https://en.wikipedia.org/wiki/Merge_sort
 	int n = sizeof(arr) / sizeof(arr[0]);
 
 	int* merged = new int[n]; // 추가 메모리 필요
